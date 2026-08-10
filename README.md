@@ -54,5 +54,7 @@ Open your browser and navigate to:
 
 🤝 Contributing
 Contributions are welcome! Feel free to open an Issue or submit a Pull Request to improve crowd analytics, UI, or performance.
-<video src="https://github.com/user-attachments/assets/3bbc2623-03b8-4437-a9a5-4f4514dcd145" width="100%" controls autoplay loop muted></video>
+
+▶️ [Click here to watch the Live Demo Video]
+(https://github.com/user-attachments/assets/3bbc2623-03b8-4437-a9a5-4f4514dcd145)
 
