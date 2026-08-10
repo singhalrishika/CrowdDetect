@@ -51,5 +51,8 @@ uvicorn main:app --reload
 Open your browser and navigate to:
 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
+
 🤝 Contributing
 Contributions are welcome! Feel free to open an Issue or submit a Pull Request to improve crowd analytics, UI, or performance.
+<img width="1920" height="1008" alt="AI Crowd Detection System - Google Chrome 11-08-2026 01_09_57" src="https://github.com/user-attachments/assets/3bbc2623-03b8-4437-a9a5-4f4514dcd145" />
+
