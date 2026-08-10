@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowd Detection Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; background-color: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
+        input[type="file"] { margin: 15px 0; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        #resultContainer { margin-top: 20px; }
+        #outputImage { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; display: none; }
+        #countDisplay { font-size: 20px; font-weight: bold; color: #28a745; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Crowd Detection System</h2>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" accept="image/*" required><br>
+            <button type="submit">Process Image</button>
+        </form>
+
+        <div id="resultContainer">
+            <div id="countDisplay"></div>
+            <img id="outputImage" alt="Detection Result">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('imageInput');
+            if (fileInput.files.length === 0) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('/detect-image/', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const count = response.headers.get('X-Person-Count');
+                document.getElementById('countDisplay').innerText = `Detected Persons: ${count}`;
+                
+                const blob = await response.blob();
+                const imgUrl = URL.createObjectURL(blob);
+                const imgElement = document.getElementById('outputImage');
+                imgElement.src = imgUrl;
+                imgElement.style.display = 'block';
+            } else {
+                alert('Error processing image');
+            }
+        });
+    </script>
+</body>
+</html>
