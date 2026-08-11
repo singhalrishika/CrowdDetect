@@ -56,6 +56,20 @@ Open your browser and navigate to:
 Contributions are welcome! Feel free to open an Issue or submit a Pull Request to improve crowd analytics, UI, or performance.
 
 
+## Demo & Screenshots
+
+### Video Demonstration
+<video width="100%" controls>
+  <source src="assets/CrowdDetect AI — Next-Gen Analytics Command Center.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### App Screenshots
+![Screenshot 1](assets/Screenshot%20(1679).png)
+![Screenshot 2](assets/Screenshot%20(1680).png)
+![Screenshot 3](assets/Screenshot%20(1681).png)
+![Screenshot 4](assets/Screenshot%20(1682).png)
+
 
 
 
