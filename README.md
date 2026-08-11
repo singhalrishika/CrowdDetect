@@ -55,11 +55,7 @@ Open your browser and navigate to:
 🤝 Contributing
 Contributions are welcome! Feel free to open an Issue or submit a Pull Request to improve crowd analytics, UI, or performance.
 
-<img width="1920" height="1080" alt="Screenshot (1682)" src="https://github.com/user-attachments/assets/a4b62062-3d6f-4c2a-8827-2b817dab82d4" />
-<img width="1920" height="1080" alt="Screenshot (1681)" src="https://github.com/user-attachments/assets/b0449fc8-733f-4225-b7ba-f910b4163085" />
-<img width="1920" height="1080" alt="Screenshot (1680)" src="https://github.com/user-attachments/assets/1956c581-ec51-4332-b993-0c8c27569fd5" />
-<img width="1920" height="1080" alt="Screenshot (1679)" src="https://github.com/user-attachments/assets/5f40bc01-2bed-458a-97c7-92a48da2be4a" />
-<img width="1920" height="1080" alt="Screenshot (1678)" src="https://github.com/user-attachments/assets/7f7c53f7-5e3b-421d-829e-b80e67d54bd3" />
+
 
 
 
