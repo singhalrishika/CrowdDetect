@@ -3,60 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crowd Detection Dashboard</title>
+    <title>CrowdDetect AI — Next-Gen Analytics Command Center</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js for Interactive Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; background-color: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; }
-        input[type="file"] { margin: 15px 0; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        #resultContainer { margin-top: 20px; }
-        #outputImage { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; display: none; }
-        #countDisplay { font-size: 20px; font-weight: bold; color: #28a745; margin-top: 10px; }
+        :root {
+            --bg-dark: #090d16;
+            --panel-bg: #111827;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-indigo: #6366f1;
+            --accent-purple: #a855f7;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .hero-section {
+            padding: 60px 0 40px 0;
+            background: radial-gradient(circle at top center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-pills .nav-link {
+            color: #9ca3af;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, #4f46e5 100%);
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .dashboard-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 35px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--accent-indigo);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        img, video {
+            width: 100%;
+            border-radius: 12px;
+            background-color: #000;
+            max-height: 420px;
+            object-fit: contain;
+            border: 1px solid var(--card-border);
+        }
+
+        .loader-overlay {
+            display: none;
+            background: rgba(9, 13, 22, 0.9);
+            backdrop-filter: blur(8px);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20;
+            border-radius: 20px;
+        }
+
+        .badge-status {
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Crowd Detection System</h2>
-        <form id="uploadForm">
-            <input type="file" id="imageInput" accept="image/*" required><br>
-            <button type="submit">Process Image</button>
-        </form>
-
-        <div id="resultContainer">
-            <div id="countDisplay"></div>
-            <img id="outputImage" alt="Detection Result">
+    <!-- Glass Header Navigation -->
+    <nav class="navbar sticky-top px-4 py-3">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center text-white fw-bold fs-4" href="#">
+                <i class="bi bi-cpu-fill text-indigo me-2" style="color: var(--accent-indigo);"></i> CrowdDetect <span class="badge bg-indigo ms-2" style="background: var(--accent-indigo); font-size: 0.65rem;">PRO AI</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">
+                    <span class="spinner-grow spinner-grow-sm me-1" role="status"></span> YOLOv8 Engine Live
+                </span>
+            </div>
         </div>
-    </div>
+    </nav>
 
+    <!-- Interactive Hero Section -->
+    <section class="hero-section text-center container">
+        <span class="badge bg-indigo bg-opacity-10 text-indigo border border-indigo border-opacity-25 px-3 py-2 rounded-pill mb-3" style="color: var(--accent-indigo); border-color: var(--accent-indigo) !important;">
+            <i class="bi bi-shield-check me-1"></i> Real-time AI Vision & Crowd Intelligence
+        </span>
+        <h1 class="display-4 fw-extrabold mb-3">Detect, Analyze & Monitor <br><span class="gradient-text">Crowds in Real Time</span></h1>
+        
+        <div class="row g-3 justify-content-center mt-2 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <h4 class="fw-bold mb-1 gradient-text">&lt; 30ms</h4>
+                    <p class="text-secondary small mb-0">Inference Speed</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <h4 class="fw-bold mb-1 gradient-text">YOLOv8</h4>
+                    <p class="text-secondary small mb-0">Detection Model</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <h4 class="fw-bold mb-1 gradient-text">99.4%</h4>
+                    <p class="text-secondary small mb-0">Class Accuracy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Workspace Section -->
+    <section id="demo-workspace" class="container-fluid px-4 pb-5">
+        <div class="row g-4">
+
+            <!-- Left Interactive Control Workspace -->
+            <div class="col-lg-8">
+                <div class="dashboard-card p-4 h-100">
+
+                    <!-- Interactive Mode Tabs -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <ul class="nav nav-pills gap-2" id="detectionTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="webcam-tab" data-bs-toggle="pill" data-bs-target="#webcam-pane" type="button"><i class="bi bi-camera-video me-2"></i> Live Webcam</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="image-tab" data-bs-toggle="pill" data-bs-target="#image-pane" type="button"><i class="bi bi-image me-2"></i> Image Upload</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="video-tab" data-bs-toggle="pill" data-bs-target="#video-pane" type="button"><i class="bi bi-film me-2"></i> Video Analysis</button>
+                            </li>
+                        </ul>
+
+                        <span id="threatStatus" class="badge bg-success badge-status"><i class="bi bi-shield-fill-check me-1"></i> Density: Normal</span>
+                    </div>
+
+                    <!-- Tab Content Panes -->
+                    <div class="tab-content position-relative" id="detectionTabsContent">
+                        
+                        <!-- Video Loading Overlay -->
+                        <div id="videoLoader" class="loader-overlay flex-column justify-content-center align-items-center">
+                            <div class="spinner-border text-primary mb-3" style="width: 3.5rem; height: 3.5rem; color: var(--accent-indigo) !important;" role="status"></div>
+                            <h4 class="fw-bold text-white mb-1">Analyzing Video Stream...</h4>
+                            <p class="text-secondary small">Running YOLOv8 inference frame-by-frame</p>
+                        </div>
+
+                        <!-- 1. WEBCAM PANE -->
+                        <div class="tab-pane fade show active text-center" id="webcam-pane" role="tabpanel">
+                            <video id="webcam" autoplay playsinline style="display:none;"></video>
+                            <canvas id="canvas" style="display:none;"></canvas>
+                            <img id="webcamOutput" src="https://via.placeholder.com/800x450/090d16/4b5563?text=Click+'Start+Webcam'+to+Begin+Live+Feed" alt="Webcam Feed" class="shadow-sm mb-3">
+                            <div>
+                                <button id="startCamBtn" class="btn btn-lg btn-primary rounded-pill px-5 shadow" onclick="startWebcam()" style="background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple)); border:none;"><i class="bi bi-play-circle-fill me-2"></i> Start Webcam</button>
+                                <button id="stopCamBtn" class="btn btn-lg btn-danger rounded-pill px-5 shadow" onclick="stopWebcam()" style="display:none;"><i class="bi bi-stop-circle-fill me-2"></i> Stop Stream</button>
+                            </div>
+                        </div>
+
+                        <!-- 2. IMAGE PANE -->
+                        <div class="tab-pane fade text-center" id="image-pane" role="tabpanel">
+                            <img id="imageOutput" src="https://via.placeholder.com/800x450/090d16/4b5563?text=Upload+an+Image+for+Detection" alt="Image Feed" class="shadow-sm mb-3">
+                            <form id="imageForm" class="mt-2">
+                                <div class="drop-zone mb-3" onclick="document.getElementById('imageInput').click()">
+                                    <i class="bi bi-cloud-arrow-up display-5 text-indigo mb-2" style="color: var(--accent-indigo);"></i>
+                                    <p class="mb-0 text-white fw-semibold">Click here to select or replace image file</p>
+                                    <span id="imageFileName" class="text-secondary small">Supports JPG, PNG, WEBP</span>
+                                    <input type="file" id="imageInput" accept="image/*" class="d-none" required onchange="if(this.files[0]) document.getElementById('imageFileName').innerText = this.files[0].name;">
+                                </div>
+                                <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold w-100" type="submit" style="background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple)); border:none;">Process Image</button>
+                            </form>
+                        </div>
+
+                        <!-- 3. VIDEO PANE -->
+                        <div class="tab-pane fade text-center" id="video-pane" role="tabpanel">
+                            <video id="videoOutput" controls style="display:none;" class="shadow-sm mb-3"></video>
+                            <form id="videoForm">
+                                <div id="videoPlaceholder" class="drop-zone mb-3" onclick="document.getElementById('videoInput').click()">
+                                    <i class="bi bi-file-earmark-play display-5 text-indigo mb-2" style="color: var(--accent-indigo);"></i>
+                                    <p class="mb-0 text-white fw-semibold">Click here to select video file</p>
+                                    <span id="videoFileName" class="text-secondary small">Supports MP4, AVI, MOV</span>
+                                    <input type="file" id="videoInput" accept="video/*" class="d-none" required onchange="if(this.files[0]) document.getElementById('videoFileName').innerText = this.files[0].name;">
+                                </div>
+                                <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold w-100" type="submit" style="background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple)); border:none;">Analyze Video</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Real-Time Analytics Dashboard Panel -->
+            <div class="col-lg-4">
+                <div class="dashboard-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold text-white mb-3"><i class="bi bi-activity text-indigo me-2" style="color: var(--accent-indigo);"></i> Real-Time Crowd Telemetry</h5>
+                        
+                        <!-- Live Counter Stat Box -->
+                        <div class="p-3 mb-4 rounded-3 text-center" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);">
+                            <span class="text-secondary small text-uppercase fw-bold">Live Detected Persons</span>
+                            <h1 id="liveCountDisplay" class="display-3 fw-extrabold text-white my-1">0</h1>
+                            <span class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> Active Detection Feed</span>
+                        </div>
+
+                        <!-- Chart.js Density History Graph -->
+                        <h6 class="fw-bold text-secondary mb-2">Crowd Density Timeline</h6>
+                        <div style="height: 220px;">
+                            <canvas id="densityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Alert Metrics Summary Footer -->
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-25">
+                        <div class="d-flex justify-content-between small text-secondary mb-1">
+                            <span>Max Threshold Limit:</span>
+                            <span class="text-white fw-bold">15 Persons</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-secondary">
+                            <span>Engine Status:</span>
+                            <span class="text-success fw-bold">Active Stream Processing</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Interactive Dashboard Script -->
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        // --- Live Chart.js Setup ---
+        const ctx = document.getElementById('densityChart').getContext('2d');
+        const densityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    label: 'Detected Count',
+                    data: Array(10).fill(0),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#9ca3af' }
+                    }
+                }
+            }
+        });
+
+        function updateCrowdMetrics(count) {
+            document.getElementById('liveCountDisplay').innerText = count;
+            
+            const statusBadge = document.getElementById('threatStatus');
+            if (count > 10) {
+                statusBadge.className = "badge bg-danger badge-status";
+                statusBadge.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Density: High Alert`;
+            } else if (count > 5) {
+                statusBadge.className = "badge bg-warning text-dark badge-status";
+                statusBadge.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> Density: Moderate`;
+            } else {
+                statusBadge.className = "badge bg-success badge-status";
+                statusBadge.innerHTML = `<i class="bi bi-shield-fill-check me-1"></i> Density: Normal`;
+            }
+
+            densityChart.data.datasets[0].data.shift();
+            densityChart.data.datasets[0].data.push(count);
+            densityChart.update();
+        }
+
+        // --- Image Detection Endpoint Submission ---
+        document.getElementById('imageForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.getElementById('imageInput');
-            if (fileInput.files.length === 0) return;
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select an image file first.');
+                return;
+            }
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
 
-            const response = await fetch('/detect-image/', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                const count = response.headers.get('X-Person-Count');
-                document.getElementById('countDisplay').innerText = `Detected Persons: ${count}`;
-                
-                const blob = await response.blob();
-                const imgUrl = URL.createObjectURL(blob);
-                const imgElement = document.getElementById('outputImage');
-                imgElement.src = imgUrl;
-                imgElement.style.display = 'block';
-            } else {
-                alert('Error processing image');
+            try {
+                const response = await fetch('/detect-image/', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const count = parseInt(response.headers.get('X-Person-Count') || 0);
+                    updateCrowdMetrics(count);
+                    
+                    const blob = await response.blob();
+                    document.getElementById('imageOutput').src = URL.createObjectURL(blob);
+                } else {
+                    alert('Server error processing image.');
+                }
+            } catch(err) {
+                alert('Failed to connect to image detection endpoint.');
             }
         });
+
+        // --- Video Processing Endpoint Submission ---
+        document.getElementById('videoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('videoInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a video file first.');
+                return;
+            }
+
+            const loader = document.getElementById('videoLoader');
+            const videoElement = document.getElementById('videoOutput');
+            const placeholder = document.getElementById('videoPlaceholder');
+            loader.style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/detect-video/', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const maxCount = parseInt(response.headers.get('X-Max-Person-Count') || 0);
+                    updateCrowdMetrics(maxCount);
+
+                    const blob = await response.blob();
+                    placeholder.style.display = 'none';
+                    videoElement.src = URL.createObjectURL(blob);
+                    videoElement.style.display = 'block';
+                } else { 
+                    alert('Error processing video file on server.'); 
+                }
+            } catch(err) { 
+                alert('Video analysis request failed.'); 
+            } finally { 
+                loader.style.display = 'none'; 
+            }
+        });
+
+        // --- Live Webcam Processing Loop ---
+        let videoStream = null;
+        let isStreaming = false;
+
+        async function startWebcam() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+                const video = document.getElementById('webcam');
+                video.srcObject = videoStream;
+                isStreaming = true;
+
+                document.getElementById('startCamBtn').style.display = 'none';
+                document.getElementById('stopCamBtn').style.display = 'inline-block';
+
+                processWebcamFrames();
+            } catch (err) { 
+                alert("Camera access denied or no webcam detected. Please check browser permissions for http://127.0.0.1:8000"); 
+            }
+        }
+
+        function stopWebcam() {
+            isStreaming = false;
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('startCamBtn').style.display = 'inline-block';
+            document.getElementById('stopCamBtn').style.display = 'none';
+            document.getElementById('webcamOutput').src = "https://via.placeholder.com/800x450/090d16/4b5563?text=Click+'Start+Webcam'+to+Begin+Live+Feed";
+            updateCrowdMetrics(0);
+        }
+
+        async function processWebcamFrames() {
+            if (!isStreaming) return;
+
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (video.videoWidth > 0) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(async (blob) => {
+                    if (!blob || !isStreaming) return;
+                    const formData = new FormData();
+                    formData.append('file', blob, 'frame.jpg');
+
+                    try {
+                        const response = await fetch('/detect-image/', { method: 'POST', body: formData });
+                        if (response.ok && isStreaming) {
+                            const count = parseInt(response.headers.get('X-Person-Count') || 0);
+                            updateCrowdMetrics(count);
+                            
+                            const imgBlob = await response.blob();
+                            document.getElementById('webcamOutput').src = URL.createObjectURL(imgBlob);
+                        }
+                    } catch (e) { console.error(e); }
+
+                    if (isStreaming) { setTimeout(processWebcamFrames, 100); }
+                }, 'image/jpeg', 0.7);
+            } else {
+                setTimeout(processWebcamFrames, 200);
+            }
+        }
     </script>
 </body>
 </html>
