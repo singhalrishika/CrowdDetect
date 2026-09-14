@@ -56,6 +56,11 @@ Open your browser and navigate to:
 Contributions are welcome! Feel free to open an Issue or submit a Pull Request to improve crowd analytics, UI, or performance.
 
 
+## 🚀 Live Demo
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://crowddetect.onrender.com)
+
+
 
 ## Screenshots
 
